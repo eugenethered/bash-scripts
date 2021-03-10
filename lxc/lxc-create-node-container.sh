@@ -1,10 +1,10 @@
 #!/bin/bash
-# creates node ready lxc container (based on alpine linux 3.10 + assumes 64 bit arch)
+# creates node ready lxc container (based on alpine linux 3.13 + assumes 64 bit arch)
 #   - provide: CONTAINER NAME
 #   - provide: IP ADDRESSS (static IP assumes on eth0 binded to bridge lxdbr0)
 #   - optional: PROVIDE HOST PROJECT DIR (base dir)
 # example:
-#   lxc-create-node-container.sh C1 10.237.245.11
+#   lxc-create-node-container.sh C1 10.192.142.10 /project-dir
 #
 # notes:
 #   Alpine Linux uses busybox, tools like ash (not bash) see - https://busybox.net/
