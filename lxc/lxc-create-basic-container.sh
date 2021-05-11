@@ -9,7 +9,7 @@
 # notes:
 #   Alpine Linux uses busybox, tools like ash (not bash) see - https://busybox.net/
 
-CONTAINER_IMAGE="alpine/3.12"
+CONTAINER_IMAGE="alpine/edge/amd64"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="contain"
@@ -58,5 +58,8 @@ lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "touch ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"#aliases\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
+# add project specific alias
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd $CONTAINER_HOME_DIR$MOUNT_BASE_DIR'\" >> ~/.bashrc"
+
 
 echo "$CONTAINER_NAME is UP"

@@ -10,7 +10,7 @@
 #   Alpine Linux uses busybox, tools like ash (not bash) see - https://busybox.net/
 #   Project dir must start with / - this is relative to both host + container dir's
 
-CONTAINER_IMAGE="alpine/3.13"
+CONTAINER_IMAGE="alpine/3.13/amd64"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="contain"
@@ -18,7 +18,7 @@ CONTAINER_GROUP="contain"
 CONTAINER_USER_ID="1000"
 CONTAINER_HOME_DIR="/home/contain"
 PROJECT_BASE_DIR="${3:-/projects}"
-NODE_VERISION="v15.11.0"
+NODE_VERISION="v16.0.0"
 NODE_TAR_FILE="node-$NODE_VERISION-linux-x64.tar.xz"
 NODE_DOWNLOAD_URL="https://nodejs.org/dist/$NODE_VERISION/$NODE_TAR_FILE"
 
