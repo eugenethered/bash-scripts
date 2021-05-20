@@ -63,10 +63,17 @@ lxc exec $CONTAINER_NAME -- apk add ca-certificates wget nodejs npm
 # add aliases
 echo "adding bash aliases..."
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "touch ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"#aliases\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# general\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
 # add project specific alias
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# projects\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd $CONTAINER_HOME_DIR$PROJECT_BASE_DIR'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias pc=\${BASH_ALIASES[project.current]}\" >> ~/.bashrc"
+# add npm specific alias
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# npm\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ns='npm start'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias nt='npm run test'\" >> ~/.bashrc"
+
 
 echo "$CONTAINER_NAME is UP with IP $IP_ADDRESS"
