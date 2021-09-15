@@ -10,7 +10,7 @@
 #   Alpine Linux uses busybox, tools like ash (not bash) see - https://busybox.net/
 #   Project dir must start with / - this is relative to both host + container dir's
 
-CONTAINER_IMAGE="alpine/3.13/amd64"
+CONTAINER_IMAGE="alpine/3.14/amd64"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="contain"
@@ -18,7 +18,7 @@ CONTAINER_GROUP="contain"
 CONTAINER_USER_ID="1000"
 CONTAINER_HOME_DIR="/home/contain"
 PROJECT_BASE_DIR="${3:-/projects}"
-NODE_VERISION="v16.0.0"
+NODE_VERISION="v16.9.1"
 NODE_TAR_FILE="node-$NODE_VERISION-linux-x64.tar.xz"
 NODE_DOWNLOAD_URL="https://nodejs.org/dist/$NODE_VERISION/$NODE_TAR_FILE"
 
@@ -27,7 +27,7 @@ wait_until_container_ready() {
 }
 
 lxc launch images:$CONTAINER_IMAGE $CONTAINER_NAME
-wait_until_container_ready "Running"
+wait_until_container_ready "RUNNING"
 
 # config container to have bash (alpine specific)
 echo "Configuring $CONTAINER_NAME to have bash"
@@ -40,7 +40,7 @@ lxc exec $CONTAINER_NAME -- ash -c "adduser -D -h $CONTAINER_HOME_DIR -u $CONTAI
 
 # grant uid permissions & link project base code dir
 lxc stop $CONTAINER_NAME
-wait_until_container_ready "Stopped"
+wait_until_container_ready "STOPPED"
 
 # map user
 lxc config set $CONTAINER_NAME raw.idmap "both $UID 1000"
@@ -54,7 +54,7 @@ fi
 
 # start container again
 lxc start $CONTAINER_NAME
-wait_until_container_ready "Running"
+wait_until_container_ready "RUNNING"
 
 # config container to have wget + nodejs (alpine specific + update already happened above)
 echo "Configuring $CONTAINER_NAME to have  wget + nodejs + npm (including npx)"
@@ -66,19 +66,23 @@ lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "touch ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# general\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 # add project specific alias
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# projects\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"HOME='$CONTAINER_HOME_DIR'\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME=\$HOME$PROJECT_BASE_DIR\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \" \" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd $PROJECT_HOME'\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias pc=\${BASH_ALIASES[project.current]}\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME='\${HOME}${PROJECT_BASE_DIR}'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd \$PROJECT_HOME'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias pc=${BASH_ALIASES[project.current]}\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 # add npm specific alias
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# npm\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ns='npm start'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias nt='npm run test'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 # add default dir (on entering container)
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# default dir\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"cd \$PROJECT_HOME\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -e \"cd \$PROJECT_HOME\" >> ~/.bashrc"
 
 echo "$CONTAINER_NAME is UP with IP $IP_ADDRESS"
