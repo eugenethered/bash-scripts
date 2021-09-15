@@ -69,8 +69,7 @@ lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 # add project specific alias
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# projects\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"HOME='$CONTAINER_HOME_DIR'\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME='\${HOME}${PROJECT_BASE_DIR}'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME='${CONTAINER_HOME_DIR}${PROJECT_BASE_DIR}'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd \$PROJECT_HOME'\" >> ~/.bashrc"
