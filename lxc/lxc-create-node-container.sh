@@ -67,21 +67,30 @@ lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# general\
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
 # add project specific alias
+echo "container project home: PROJECT_HOME='${CONTAINER_HOME_DIR}${PROJECT_BASE_DIR}'"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# projects\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME='${CONTAINER_HOME_DIR}${PROJECT_BASE_DIR}'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias project.current='cd \$PROJECT_HOME'\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias pc=${BASH_ALIASES[project.current]}\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"alias project.current='cd $\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"alias pc=$\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"{\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"BASH_ALIASES[project.current]\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"}\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
 # add npm specific alias
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# npm\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ns='npm start'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias nt='npm run test'\" >> ~/.bashrc"
 lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 # add default dir (on entering container)
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# default dir\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -e \"cd \$PROJECT_HOME\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# default dir (when logging in)\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"cd $\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 
 echo "$CONTAINER_NAME is UP with IP $IP_ADDRESS"
