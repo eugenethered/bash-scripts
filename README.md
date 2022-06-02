@@ -16,7 +16,7 @@ Creates container based on Alpine linux, super lightweight ;)
 Will mount project source code dir on host in container.
 >lxc/lxc-create-node-container.sh CONTAINER_NAME IP_ADDRESS
 \
-e.g. ```lxc/lxc-create-node-container.sh CONTAINER-NAME 10.192.142.2```
+e.g. ```lxc/lxc-create-node-container.sh CONTAINER-NAME 10.104.71.2```
 
 ## Create react container code project
 Creates react code container (based on node container).

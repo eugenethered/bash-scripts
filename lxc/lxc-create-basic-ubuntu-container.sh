@@ -7,13 +7,11 @@
 #   lxc-create-basic-container.sh C1 IP /my-projects
 #
 # notes:
-#   This is specific for Ubuntu
-
-# !! DOES NOT WORK !!
-
+#   This is specific for Ubuntu 20.04
+#   Check images with [lxc image list images: ubuntu amd64]
 
 
-CONTAINER_IMAGE="ubuntu-minimal:20.04"
+CONTAINER_IMAGE="ubuntu:21.04"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="ubuntu"
@@ -26,7 +24,7 @@ wait_until_container_ready() {
 }
 
 lxc launch $CONTAINER_IMAGE $CONTAINER_NAME
-wait_until_container_ready "Running"
+wait_until_container_ready "RUNNING"
 
 # config container to have bash (alpine specific)
 echo "Configuring $CONTAINER_NAME to have bash"
@@ -35,7 +33,7 @@ lxc exec $CONTAINER_NAME -- apt upgrade
 
 # grant uid permissions & link project base code dir
 lxc stop $CONTAINER_NAME
-wait_until_container_ready "Stopped"
+wait_until_container_ready "STOPPED"
 
 # map user
 lxc config set $CONTAINER_NAME raw.idmap "both $UID 1000"
@@ -43,13 +41,16 @@ lxc config device add $CONTAINER_NAME project-dir disk source=$HOME$MOUNT_BASE_D
 
 # assign static ip
 if [ $IP_ADDRESS != "DEFAULT_ASSIGNED_IP" ]; then
-  lxc network attach lxdbr0 $CONTAINER_NAME eth0
+  #lxc network attach lxdbr0 $CONTAINER_NAME eth0
+  lxc config device add $CONTAINER_NAME eth0 nic nictype=bridged parent=lxdbr0 name=eth0
   lxc config device set $CONTAINER_NAME eth0 ipv4.address $IP_ADDRESS
 fi
 
+echo "huge 5"
+
 # start container again
 lxc start $CONTAINER_NAME
-wait_until_container_ready "Running"
+wait_until_container_ready "RUNNING"
 
 # add aliases
 echo "adding bash aliases..."

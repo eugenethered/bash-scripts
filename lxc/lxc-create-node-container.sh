@@ -10,7 +10,7 @@
 #   Alpine Linux uses busybox, tools like ash (not bash) see - https://busybox.net/
 #   Project dir must start with / - this is relative to both host + container dir's
 
-CONTAINER_IMAGE="alpine/3.14/amd64"
+CONTAINER_IMAGE="alpine/3.16/amd64"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="contain"
