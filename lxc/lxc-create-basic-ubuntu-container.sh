@@ -4,14 +4,14 @@
 #   - optional: CONTAINER IP Address
 #   - optional: PROVIDE HOST MOUNT DIR (defaults to /projects)
 # example:
-#   lxc-create-basic-container.sh C1 IP /my-projects
+#   lxc-create-basic-ubuntu-container.sh CONTAINER-NAME IP.ADD.RE.SS /my-projects
 #
 # notes:
-#   This is specific for Ubuntu 20.04
+#   This is specific for Ubuntu 22.04
 #   Check images with [lxc image list images: ubuntu amd64]
 
 
-CONTAINER_IMAGE="ubuntu:21.04"
+CONTAINER_IMAGE="ubuntu:22.04"
 CONTAINER_NAME=$1
 IP_ADDRESS="${2:DEFAULT_ASSIGNED_IP}"
 CONTAINER_USER="ubuntu"
@@ -46,17 +46,38 @@ if [ $IP_ADDRESS != "DEFAULT_ASSIGNED_IP" ]; then
   lxc config device set $CONTAINER_NAME eth0 ipv4.address $IP_ADDRESS
 fi
 
-echo "huge 5"
-
 # start container again
 lxc start $CONTAINER_NAME
 wait_until_container_ready "RUNNING"
 
+
 # add aliases
 echo "adding bash aliases..."
-lxc exec $CONTAINER_NAME -- sudo su -l $CONTAINER_USER_ID -- bash -c "touch ~/.bashrc"
-lxc exec $CONTAINER_NAME -- sudo su -l $CONTAINER_USER_ID -- bash -c "echo \"#aliases\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME -- sudo su -l $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
-lxc exec $CONTAINER_NAME -- sudo su -l $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "touch ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# general\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias la='ls -la'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"alias ll='ls -lh'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
 
-echo "$CONTAINER_NAME is UP"
+# add project specific alias
+echo "container project home: PROJECT_HOME='${CONTAINER_HOME_DIR}${MOUNT_BASE_DIR}'"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# projects\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME='${CONTAINER_HOME_DIR}${MOUNT_BASE_DIR}'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"alias project.current='cd $\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME'\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"alias pc=$\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"{\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"BASH_ALIASES[project.current]\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"}\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
+# add default dir (on entering container)
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"# default dir (when logging in)\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo -n \"cd $\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo \"PROJECT_HOME\" >> ~/.bashrc"
+lxc exec $CONTAINER_NAME --user $CONTAINER_USER_ID -- bash -c "echo '' >> ~/.bashrc"
+
+echo "$CONTAINER_NAME is UP with IP $IP_ADDRESS"
+
